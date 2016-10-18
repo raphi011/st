@@ -51,13 +51,6 @@ sum(compdata$umsatz * compdata$anteil)
 
 # ue1.14
 #========
-attach(dat)
-by(Height, Gender, kennz, ro=3)
-detach(dat)
-
-
-# ue1.15
-#========
 dat <- read.table("body.txt", header=TRUE)[,c(1,12,22,23,24,25)]
 #  V1 = Biacromial diameter (Schulter) (cm)
 # V12 = Waist girth (Taille) (cm)
@@ -66,6 +59,28 @@ dat <- read.table("body.txt", header=TRUE)[,c(1,12,22,23,24,25)]
 # V24 = Height (cm)
 # V25 = Gender (1 - male, 0 - female)
 names(dat) <- c("Biacromial","Waist","Age","Weight","Height","Gender")
+
+
+
+# Kennzahlen
+kennz <- function(x, ro=4) {
+  param <- c(mean(x), median(x), max(x)-min(x), var(x), 
+             sd(x), sd(x)/mean(x), IQR(x), mean(abs(x-mean(x))), 
+             mean(abs(x-median(x)))) 
+  param.m <- matrix(param, ncol=1)
+  dimnames(param.m) <- list(c("Mittel","Median","Spannweite",
+                              "Varianz","Streuung","VarKoef","IQR","MAD.Mittel",
+                              "MAD.Median"), "")
+  round(param.m, ro)
+}
+
+attach(dat)
+by(Height, Gender, kennz, ro=3)
+detach(dat)
+
+
+# ue1.15
+#========
 dat1 <- within(dat, { BMI <- Weight/(Height/100)^2 })
 dat1f <- subset(dat1, Gender==0)
 dat1m <- subset(dat1, Gender==1)
